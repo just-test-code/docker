@@ -16,6 +16,7 @@ RUN apt-get update && apt-get upgrade -y && \
     # SSH
     openssh-server \
     # 基础工具
+    sudo \
     curl \
     wget \
     git \
@@ -60,7 +61,6 @@ RUN apt-get update && apt-get upgrade -y && \
     python3-venv \
     python3-dev \
     # Shell & 终端
-    zsh \
     bash-completion \
     tmux \
     # 进程管理
@@ -72,8 +72,17 @@ RUN apt-get update && apt-get upgrade -y && \
     # 本地化
     locales \
     tzdata \
+    fonts-firacode \
     && apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+# ============================================================
+# 配置 Locale & 时区
+# ============================================================
+RUN locale-gen en_US.UTF-8 && \
+    update-locale LANG=en_US.UTF-8 && \
+    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
+    echo $TZ > /etc/timezone
 
 # ============================================================
 # 配置 SSH
@@ -128,6 +137,36 @@ alias gl='git log --oneline --graph --all'
 # ---- PATH ----
 export PATH="$HOME/.local/bin:$PATH"
 EOF
+
+# ============================================================
+# 安装 ZSH & Oh-My-Zsh & 插件
+# ============================================================
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    zsh \
+    git \
+    fonts-firacode \
+    wget \
+    curl \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN curl -fsSL --max-time 30 \
+    https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh \
+    | sh -s -- --unattended
+RUN cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc
+RUN wget --timeout=30 \
+    http://raw.github.com/caiogondim/bullet-train-oh-my-zsh-theme/master/bullet-train.zsh-theme \
+    -O ~/.oh-my-zsh/themes/bullet-train.zsh-theme
+RUN sed -i "s/ZSH_THEME=.*/ZSH_THEME='bullet-train'/" ~/.zshrc
+RUN git clone --depth=1 \
+    https://github.com/zsh-users/zsh-autosuggestions \
+    ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+RUN git clone --depth=1 \
+    https://github.com/zsh-users/zsh-syntax-highlighting.git \
+    ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+RUN sed -i "s/plugins=.*/plugins=(extract zsh-syntax-highlighting zsh-autosuggestions git)/" ~/.zshrc && \
+    echo "source ~/.profile" >> ~/.zshrc
+# 设置 zsh 为默认 shell
+RUN chsh -s /bin/zsh
+
 
 # ============================================================
 # 启动脚本
