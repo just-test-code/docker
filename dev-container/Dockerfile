@@ -76,22 +76,6 @@ RUN apt-get update && apt-get upgrade -y && \
     rm -rf /var/lib/apt/lists/*
 
 # ============================================================
-# 安装 Node.js LTS
-# ============================================================
-RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - && \
-    apt-get install -y nodejs && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-# ============================================================
-# 配置 Locale & 时区
-# ============================================================
-RUN locale-gen en_US.UTF-8 && \
-    update-locale LANG=en_US.UTF-8 && \
-    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
-    echo $TZ > /etc/timezone
-
-# ============================================================
 # 配置 SSH
 # ============================================================
 RUN mkdir -p /var/run/sshd && \
