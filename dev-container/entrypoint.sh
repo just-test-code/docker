@@ -26,10 +26,8 @@ else
 fi
 
 if [ -n "${CLOUDFLARED_TOKEN}" ]; then
-    cloudflared service install --token "${CLOUDFLARED_TOKEN}"
+    cloudflared service install "${CLOUDFLARED_TOKEN}"
     echo "[INFO] Cloudflare tunnel installed."
-    cloudflared service start
-    echo "[INFO] Cloudflare tunnel started."
 fi
 
 # 确保 host keys 存在

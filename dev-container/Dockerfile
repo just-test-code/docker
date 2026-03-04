@@ -166,7 +166,7 @@ RUN chsh -s /bin/zsh
 RUN curl --proto '=https' --tlsv1.2 -sSf https://scripts.vmr.dpdns.org | sh
 
 # ============================================================
-# 安装 VMR
+# 安装 cloudflare
 # ============================================================
 # Add cloudflare gpg key
 RUN sudo mkdir -p --mode=0755 /usr/share/keyrings
@@ -177,6 +177,15 @@ RUN echo 'deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cl
 
 # install cloudflared
 RUN sudo apt-get update && sudo apt-get install cloudflared
+
+# ============================================================
+# 安装 docker 编译命令
+# ============================================================
+RUN install -m 0755 -d /etc/apt/keyrings
+RUN curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+RUN chmod a+r /etc/apt/keyrings/docker.gpg
+RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+RUN apt-get update && apt-get install -y docker-ce-cli
 
 # ============================================================
 # 启动脚本
