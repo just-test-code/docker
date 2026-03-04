@@ -76,13 +76,6 @@ RUN apt-get update && apt-get upgrade -y && \
     && apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# ============================================================
-# 配置 Locale & 时区
-# ============================================================
-RUN locale-gen en_US.UTF-8 && \
-    update-locale LANG=en_US.UTF-8 && \
-    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
-    echo $TZ > /etc/timezone
 
 # ============================================================
 # 配置 SSH
@@ -166,6 +159,11 @@ RUN sed -i "s/plugins=.*/plugins=(extract zsh-syntax-highlighting zsh-autosugges
     echo "source ~/.profile" >> ~/.zshrc
 # 设置 zsh 为默认 shell
 RUN chsh -s /bin/zsh
+
+# ============================================================
+# 安装 VMR
+# ============================================================
+RUN curl --proto '=https' --tlsv1.2 -sSf https://scripts.vmr.dpdns.org | sh
 
 
 # ============================================================
