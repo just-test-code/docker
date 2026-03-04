@@ -165,6 +165,18 @@ RUN chsh -s /bin/zsh
 # ============================================================
 RUN curl --proto '=https' --tlsv1.2 -sSf https://scripts.vmr.dpdns.org | sh
 
+# ============================================================
+# 安装 VMR
+# ============================================================
+# Add cloudflare gpg key
+RUN sudo mkdir -p --mode=0755 /usr/share/keyrings
+RUN curl -fsSL https://pkg.cloudflare.com/cloudflare-main.gpg | sudo tee /usr/share/keyrings/cloudflare-main.gpg >/dev/null
+
+# Add this repo to your apt repositories
+RUN echo 'deb [signed-by=/usr/share/keyrings/cloudflare-main.gpg] https://pkg.cloudflare.com/cloudflared any main' | sudo tee /etc/apt/sources.list.d/cloudflared.list
+
+# install cloudflared
+RUN sudo apt-get update && sudo apt-get install cloudflared
 
 # ============================================================
 # 启动脚本

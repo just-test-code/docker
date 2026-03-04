@@ -25,6 +25,13 @@ else
     echo "[WARN] No SSH public key found! You won't be able to login."
 fi
 
+if [ -n "${CLOUDFLARED_TOKEN}" ]; then
+    cloudflared service install --token "${CLOUDFLARED_TOKEN}"
+    echo "[INFO] Cloudflare tunnel installed."
+    cloudflared service start
+    echo "[INFO] Cloudflare tunnel started."
+fi
+
 # 确保 host keys 存在
 ssh-keygen -A > /dev/null 2>&1
 
